@@ -22,8 +22,41 @@ export class DataService {
     return of(this.users);
   }
 
-  getBookings() : Observable<Array<Booking>> {
-    return of(this.bookings);
+  getBookings(date: string) : Observable<Array<Booking>> {
+    return of(this.bookings.filter(b => b.date === date));
+  }
+
+  getBooking(id: number) : Observable<Booking> {
+      return of(this.bookings.find(b => b.id === id));
+  }
+
+  saveBooking(booking: Booking) : Observable<Booking>{
+    const existingBooking = this.bookings.find(b => b.id === booking.id);
+    existingBooking.date = booking.date;
+    existingBooking.startTime = booking.startTime;
+    existingBooking.endTime = booking.endTime;
+    existingBooking.title = booking.title;
+    existingBooking.user = booking.user;
+    existingBooking.layout = booking.layout;
+    existingBooking.room = booking.room;
+    existingBooking.participants = booking.participants;
+    return of(existingBooking);
+  }
+
+  addBooking(newBooking: Booking) : Observable<Booking> {
+    let id = 0;
+    for(const booking of this.bookings) {
+      if(booking.id > id) id=booking.id;
+    }
+    newBooking.id = id+1;
+    this.bookings.push(newBooking);
+    return of(newBooking);
+  }
+
+  deleteBooking(id: number) : Observable<any> {
+    const booking = this.bookings.find(b => b.id === id);
+    this.bookings.splice(this.bookings.indexOf(booking), 1);
+    return of(null);
   }
 
   updateUser(user: User) : Observable<User>{
@@ -138,7 +171,7 @@ export class DataService {
     booking1.user = user1;
     booking1.layout = Layout.THEATER;
     booking1.title = 'Example meeting';
-    booking1.date = formatDate(new Date(), 'yyyy-MM-dd', 'en-GB');
+    booking1.date = formatDate(new Date(), 'yyyy-MM-dd', 'pl-PL');
     booking1.startTime = '11:30';
     booking1.endTime = '12:30';
     booking1.participants = 12;
@@ -149,7 +182,7 @@ export class DataService {
     booking2.user = user2;
     booking2.layout = Layout.USHAPE;
     booking2.title = 'Another meeting';
-    booking2.date = formatDate(new Date(), 'yyyy-MM-dd', 'en-GB');
+    booking2.date = formatDate(new Date(), 'yyyy-MM-dd', 'pl-PL');
     booking2.startTime = '14:30';
     booking2.endTime = '15:30';
     booking2.participants = 5;
