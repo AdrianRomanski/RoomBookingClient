@@ -27,9 +27,9 @@ export class RoomsComponent implements OnInit {
       }
     );
 
-    this.route.snapshot.queryParams['id'];
     this.route.queryParams.subscribe(
       (params) => {
+        this.action = null;
         const id = params['id'];
         if(id) {
           this.selectedRoom = this.rooms.find(room => room.id === +id); // casting to a number
