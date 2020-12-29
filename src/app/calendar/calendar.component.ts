@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {formatDate} from "@angular/common";
-import {Booking} from "../model/Booking";
-import {DataService} from "../data.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {formatDate} from '@angular/common';
+import {Booking} from '../model/Booking';
+import {DataService} from '../data.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {User} from '../model/User';
 
 @Component({
   selector: 'app-calendar',
@@ -12,42 +13,51 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class CalendarComponent implements OnInit {
 
   bookings: Array<Booking>;
-  selectedDate : string;
+  selectedDate: string;
 
   constructor(private dataService: DataService,
               private router: Router,
               private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.dataService.getUser(13).subscribe(
+      (next: User) => {
+        console.log(next);
+        console.log(next.name);
+        console.log(typeof next);
+        console.log(next.getRole());
+      }
+    );
+
+
     this.route.queryParams.subscribe(
       params => {
-        this.selectedDate = params['date'];
-        if(!this.selectedDate) {
+        this.selectedDate = params.date;
+        if (!this.selectedDate) {
           this.selectedDate = formatDate(new Date(), 'yyyy.MM.dd', 'pl-PL');
         }
         this.dataService.getBookings(this.selectedDate).subscribe(
           next => this.bookings = next
         );
       }
-    )
-
+    );
   }
 
-  editBooking(id: number) {
+  editBooking(id: number): void {
     this.router.navigate(['editBooking'], {queryParams: {id}});
   }
 
-  addBooking() {
+  addBooking(): void {
     this.router.navigate(['addBooking']);
   }
 
-  deleteBooking(id: number) {
+  deleteBooking(id: number): void {
     this.dataService.deleteBooking(id).subscribe(
     );
   }
 
-  dateChanged() {
-    this.router.navigate([''], {queryParams : {date : this.selectedDate}})
+  dateChanged(): void {
+    this.router.navigate([''], {queryParams : {date : this.selectedDate}});
   }
 
 }
