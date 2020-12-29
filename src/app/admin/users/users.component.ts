@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {User} from "../../model/User";
-import {DataService} from "../../data.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {FormResetService} from "../../form-reset.service";
+import {User} from '../../model/User';
+import {DataService} from '../../data.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormResetService} from '../../form-reset.service';
 
 @Component({
   selector: 'app-users',
@@ -14,6 +14,8 @@ export class UsersComponent implements OnInit {
   users: Array<User>;
   selectedUser: User;
   action: string;
+  message = 'Loading data... please wait';
+  loadingData = true;
 
   constructor(private dataService: DataService,
               private router: Router,
@@ -24,17 +26,22 @@ export class UsersComponent implements OnInit {
     this.dataService.getUsers().subscribe(
       next => {
         this.users = next;
+        this.loadingData = false;
+        this.route.queryParams.subscribe(
+          (params) => {
+            const id = params['id'];
+            this.action = params['action'];
+            if(id) {
+              this.selectedUser = this.users.find(user => user.id === +id);
+            }
+          }
+        );
+      },
+      error => {
+        this.message = 'An error occurred - please contact support';
       }
     );
-    this.route.queryParams.subscribe(
-      (params) => {
-        const id = params['id'];
-        this.action = params['action'];
-        if(id) {
-          this.selectedUser = this.users.find(user => user.id === +id);
-        }
-      }
-    )
+
   }
 
   setUser(id : number): void {
